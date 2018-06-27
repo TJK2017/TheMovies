@@ -1,0 +1,62 @@
+﻿@model TheMovies.Models.Movie
+@using TheMovies.Models
+
+<div class="jumbotron">
+    <p>MOVIE LISTINGS</p>
+</div>
+<div class="container">
+    <div class="well bs-component ">
+        <div class="panel">
+            <div class="panel-heading ">
+                <div class="lead">Create Movie</div>
+            </div>
+            <div class="panel-body">
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="row ">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div class="form-group col-xs-4">
+                            @Html.LabelFor(model => model.MovieTitle, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.MovieTitle, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.MovieTitle, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group col-xs-4">
+                            @Html.LabelFor(model => model.ReleaseDate, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                <div class='input-group' id='datetimepicker'>
+                                    <input type='text' name="ReleaseDate" class="form-control" data-date-format="DD/MM/YYYY" />
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                                </div>
+                                @Html.ValidationMessageFor(model => model.ReleaseDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group col-xs-4">
+                            @Html.LabelFor(model => model.Genre, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("Genre", EnumHelper.GetSelectList(typeof(Genre)), "", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Genre, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" class="btn btn-success" value="Save" />
+                            @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-warning" })
+                        </div>
+                    </div>
+
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $('#datetimepicker').datetimepicker();
+        });</script>
+    @Scripts.Render("~/bundles/jqueryval")
+}

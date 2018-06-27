@@ -1,31 +1,272 @@
-﻿@{
-    ViewBag.Title = "Home Page";
-}
+﻿@model IEnumerable<TheMovies.Models.Movie>
+
 
 <div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+    <p>MOVIE LISTINGS</p>
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
-</div>
+
+<div class="container-fluid">
+
+    @{
+        ViewBag.Title = "Index";
+    }
+
+    <p>
+        @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-success" })
+    </p>
+    <div class="row">
+        <div class="col-xs-8">
+            <table id="movieTable" class="table table-condensed table-responsive table-striped">
+                <tr>
+                    <th>
+                        <p class="text-danger">@Html.DisplayNameFor(model => model.MovieTitle)</p>
+                    </th>
+                    <th>
+                        <a class="btn btn-xs btn-danger" href="@Url.Action("Index", new { sortOrder = @ViewBag.dateOrder })">
+                            @if (ViewBag.dateOrder == "ascDate")
+                            {
+                                <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                            }
+                            else if (ViewBag.dateOrder == "descDate")
+                            {
+                                <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+
+                            }
+                            &nbsp;ReleaseDate
+                        </a>
+                    </th>
+                    <th>
+                        <a class="btn btn-xs btn-danger" href="@Url.Action("Index", new { sortOrder = @ViewBag.genreOrder })">
+                            @if (ViewBag.genreOrder == "descGenre")
+                            {
+                                <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                            }
+                            else if (ViewBag.genreOrder == "ascGenre")
+                            {
+                                <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+
+                            }
+                            &nbsp;Genre
+                        </a>
+                    </th>
+                    <th></th>
+                </tr>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <span class="btn btn-xs btn-warning"
+                                  onclick="showActor('@item.MovieId')">@Html.DisplayFor(modelItem => item.MovieTitle)</span>
+                            </td>
+                            <td>
+                                <p class="text-warning">@Html.DisplayFor(modelItem => item.ReleaseDate)</p>
+                            </td>
+                            <td>
+                                <p class="text-warning">@Html.DisplayFor(modelItem => item.Genre)</p>
+                            </td>
+                            <td>
+
+                                <span class="btn btn-sm btn-warning" onclick="edit('@item.MovieId','@item.MovieTitle','@item.Genre')">Edit</span>
+                                <span class="btn btn-sm btn-warning" onclick="filmDetails(@item.MovieId)">Details</span>
+                                @Html.ActionLink("Delete", "Delete", new { id = item.MovieId }, new { @class = "btn btn-danger btn-sm" })
+
+                            </td>
+                        </tr>
+                    }
+            </table>
+        </div>
+        <div class="col-xs-4">
+            <div id="Detail"></div>
+            <div>
+                <form id="CreateActor" hidden="">
+                    <div id="time" class="form-group" style="margin-top: 10px">
+                        <input type="hidden" name="MovieId">
+                        <H5>ADD CAST TO THE MOVIE</H5>
+                        <input type="text" placeholder="ActorsName" name="ActorFirstName">
+                        &nbsp;<input type="text" placeholder="ScreenName" name="ScreenName">
+                        <input type="submit" value="Add" class="btn btn-xs btn-success" style="margin-top: -5px;" />
+                    </div>
+                </form>
+                <form id="EditActor" hidden="">
+                    <div class="form-group" style="margin-top: 10px">
+                        <input type="hidden" name="MovieId">
+                        <input type="hidden" name="ActorId">
+                        <input type="hidden" name="ScreenNameId">
+                        <input type="text" name="ActorFirstName" value="">
+                        <input type="text" name="ScreenName" value="">
+                        <input type="submit" value="Save" class="btn btn-xs btn-success" style="margin-top: -5px;" />
+                        <input type="button" value="Cancel" onclick="$('#EditActor').hide(); $('#CreateActor').show();" class="btn btn-xs btn-warning" style="margin-top: -5px;" />
+                    </div>
+                </form>
+                <form id="FilmDetails" hidden="">
+                    <div class="form-group" style="margin-top: 10px">
+                        <input type="hidden" name="MovieId">
+                        <input type="text" name="MovieTitle" value="">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div id="Details"></div>
+
+        </div>
+    </div> @*end div class row*@
+</div>  @*end container*@
+
+
+@section scripts
+  {
+    <script>
+            $(function () {      // ready event
+                toastr.success('Welcome To The Movie DataBase');
+                toastr.options = {
+                    "progressBar": true,
+                }
+            });
+            function filmDetails(MovieId) {
+
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("FilmDetails")',
+                    data: { id: MovieId },
+                    success: function (data) {
+                        $('#Detail').hide();
+                        $('#CreateActor').hide();
+                        $('#Detail').html(data);
+                        $('#Detail').fadeIn("slow")
+                        $('#Detail').find('input[name="MovieId"]').val(MovieId);
+                        $('#Detail').find('input[name="MovieTitle"]').val("");
+                        //$('#CreateActor').fadeIn("slow");
+                    },
+                    error: function (data) {
+                        $('#Details').html('<h3>Error in retrieval</h3>');
+                    }
+                });
+            }
+            function edit(MovieId,MovieTitle, Genre) {
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("EditMovie")',
+                    data: { id: MovieId },
+                    success: function (data) {
+                        $('#Detail').hide();
+                        $('#CreateActor').hide();
+                        $('#Detail').html(data);
+                        $('#Detail').fadeIn("slow")
+                        $('#Detail').find('input[name="MovieId"]').val(MovieId);
+                        $('#Detail').find('input[name="MovieTitle"]').val(MovieTitle);
+                        $('#Detail').find('input[name="ReleaseDate"]').val();
+                        $('#Detail').find('input[name="Genre"]').val(Genre);
+
+
+                    },
+                    error: function (data) {
+                        $('#Details').html('<h3>Error in retrieval</h3>');
+                    }
+                });
+            }
+
+
+            function showActor(MovieId) {
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("ActorById")',
+                    data: { id: MovieId },
+                    success: function (data) {
+                        $('#Detail').hide();
+                        $('#CreateActor').hide();
+                        $('#Detail').html(data);
+                        $('#Detail').fadeIn("slow");
+                        $('#CreateActor').find('input[name="MovieId"]').val(MovieId);
+                        $('#CreateActor').find('input[name="ActorFirstName"]').val("");
+                        $('#CreateActor').find('input[name="ScreenName"]').val("");
+                        $('#CreateActor').fadeIn("slow");
+
+                    },
+                    error: function (data) {
+                        $('#Detail').html('<h3>Error in retrieval</h3>');
+                    }
+                });
+            }
+
+
+             //POSTback of creating a new Actor
+            $('#CreateActor').submit(function () {
+                if ($(this).find('input[name="ActorFirstName"]').val()!="") {
+                $.ajax({
+                    url: '@Url.Action("CreateActor")',
+                    type: "POST",
+                    data: $(this).serialize(),
+                    success: function() {
+                        showActor($('form').find('input[name="MovieId"]').val());
+                        toastr.info($('form').find('input[name="ActorFirstName"]').val() + ' Added');
+
+                        $('form').find('input[name="ActorFirstName"]').val("");
+
+                    }
+                });
+            }
+            return false;
+        });
+
+            function showEditActor(MovieId, ActorId, ActorFirstName,ScreenNameId,ScreenName) {
+                $('#EditActor').slideDown("fast");
+                $('#EditActor').show();
+                $('#CreateActor').hide();
+                $('#EditActor :input[name="ActorId"]').val(ActorId);
+                $('#EditActor :input[name="MovieId"]').val(MovieId);
+                $('#EditActor :input[name="ActorFirstName"]').val(ActorFirstName);
+                $('#EditActor  :input[name="ScreenNameId"]').val(ScreenNameId);
+                $('#EditActor  :input[name="ScreenName"]').val(ScreenName);
+
+
+            }
+
+            $('#EditActor').submit(function () {
+                $.ajax({
+                    url: '@Url.Action("UpdateActor")',
+                    type: "POST",
+                    data: $(this).serialize(),
+                    success: function () {
+                        $('#EditActor').hide();
+                        showActor($('#EditActor :input[name="MovieId"]').val());
+
+                    },
+                    error: function (data) {
+                        $('#Detail').html('<h3>Cant Edit</h3>');
+                    }
+                });
+                return false;
+            });
+
+            function deleteActor(ActorId, MovieId,ScreenNameId) {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("DeleteActor")',
+                    data: { id: ActorId, MovieId: MovieId, ScreenNameId: ScreenNameId },
+                    success: function (data) {
+                        $('#Detail').hide();
+                        $('#CreateActor').hide();
+                        $('#Detail').html(data);
+                        $('#Detail').fadeIn("slow");
+                        $('#CreateActor').find('input[name="MovieId"]').val(MovieId);
+                        $('#CreateActor').find('input[name="ActorFirstName"]').val("");
+                        $('#CreateActor').find('input[name="ScreenName"]').val("");
+                        showActor(MovieId)
+                        $('#CreateActor').hide();
+                        $('#CreateActor').fadeIn("slow");
+
+
+                    },
+
+                    error: function (data) {
+                        $('#Detail').html('<h3>Error in retrieval</h3>');
+                    }
+                });
+            }
+
+
+
+    </script>
+}

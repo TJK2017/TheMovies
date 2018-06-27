@@ -1,0 +1,39 @@
+﻿@model TheMovies.Models.Movie
+<div class="container">
+    <div class="well bs-component ">
+        <div class="panel">
+            <div class="panel-heading">
+                <h4>Confirm deletion of @Model.MovieTitle</h4>
+            </div>
+        </div>
+        <div class="panel-body"></div>
+        <fieldset>
+            <div>
+                <dl class=" col-md-4">
+                    <dt> @Html.DisplayNameFor(model => model.MovieTitle)</dt>
+                    <dd>@Html.DisplayFor(model => model.MovieTitle)</dd>
+                </dl>
+                <dl class=" col-md-4">
+                    <dt> @Html.DisplayNameFor(model => model.ReleaseDate)</dt>
+                    <dd> @Html.DisplayFor(model => model.ReleaseDate)</dd>
+                </dl>
+                <dl class=" col-md-4">
+                    <dt> @Html.DisplayNameFor(model => model.Genre)</dt>
+                    <dd>@Html.DisplayFor(model => model.Genre)</dd>
+                </dl>
+            </div>
+        </fieldset>
+    </div>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-warning" /> |
+            @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-success" })
+        </div>
+    }
+</div>
+
+
+
